@@ -1,9 +1,9 @@
-function renderQuestion(listOfQuestions, currentQuestion) {
-	var html = "<p>" + listOfQuestions[currentQuestion].question + "</p>" 
-				+ "<p>" + listOfQuestions[currentQuestion].choices + "</p>";
-
-	$('.question').empty();		
-	$('.question').append(html); //TODO: is append a good one to call here?
+function renderQuestion(listOfQuestions, theQuestion, numOfChoices) {
+	//TODO: render the question containing radio buttons for the choices
+	var html = '<p>' + listOfQuestions[theQuestion].question + '</p>';
+	
+	
+	$('.question').html( html ); 
 }
 
 $(document).ready(function(){
@@ -27,7 +27,7 @@ $(document).ready(function(){
 	];
 
 	var currentQuestion = 0;
-
+	var numOfChoices = 
 
 	$('.back').hide();
 	$('.next').hide();
@@ -46,7 +46,6 @@ $(document).ready(function(){
 	});
 
 	$('.next').on('click', function(event) {
-		
 		if ( ++currentQuestion > (allQuestions.length - 1) ) {
 			currentQuestion = 0;
 		}
