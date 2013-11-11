@@ -1,11 +1,29 @@
-function renderQuestion(listOfQuestions, theQuestion, numOfChoices) {
-	//TODO: render the question containing radio buttons for the choices
+/**
+ * 	Renders the question containing the radio buttons for the choices.
+ *
+ *	NOTE: The requirement was a bit ambiguous where it said, "The quiz can
+ *	show any number of questions and any number of choices". Does it mean
+ *	there's a random number generated that will determine how many choices to 
+ *	render? In any case, I decided to ignore parts of the requirement, 
+ *	specifically the "any number of choices" part.
+ */
+function renderQuestion(listOfQuestions, theQuestion) {
 	var html = '<p>' + listOfQuestions[theQuestion].question + '</p>';
-	
-	
-	$('.question').html( html ); 
+
+	for (var index = 0; 
+			index < listOfQuestions[theQuestion].choices.length; 
+			index++) {
+		html += '<input type="radio" name="choices" value="' 
+			+ index + '" ' + (index === 0 ? 'checked' : ' ') + '/> ' 
+			+ listOfQuestions[theQuestion].choices[index] + '<br>';
+	}
+	$('.question').html(html);
 }
 
+
+/**
+ * load all the tings.
+ */
 $(document).ready(function(){
 	var allQuestions = [ 
 	{
@@ -21,44 +39,78 @@ $(document).ready(function(){
 	},
 	{
 		question: "2+2?",
-		choices: ["4", "8", "0", "10", "900"],
-		correctAnswer: 0
+		choices: ["8", "4", "0", "10", "900"],
+		correctAnswer: 1
 	}
 	];
 
 	var currentQuestion = 0;
-	var numOfChoices = 
+	var numOfQuestions = Math.floor(Math.random() * allQuestions.length);
+	var score = 0;
 
 	$('.back').hide();
 	$('.next').hide();
+	$('.question').hide();
+	$('.restart').hide();
 	$('.start').show('slow');
 
 	$('.start').on('click', function(event){
 		event.preventDefault();
 		$('.start').hide('slow');
-		$('.back').show('slow');
 		$('.next').show('slow', function(){
 
-			renderQuestion(allQuestions, currentQuestion);
+			$('.question').fadeOut("fast", function(){
+				renderQuestion(allQuestions, currentQuestion);
+				
+			});
+			$('.question').fadeIn("fast");
 		});
 
 		event.stopPropagation();
 	});
 
 	$('.next').on('click', function(event) {
-		if ( ++currentQuestion > (allQuestions.length - 1) ) {
-			currentQuestion = 0;
+		//get answer
+		var userAnswer = Number($('.question').children('input[type="radio"]:checked')
+									.val());
+		
+		if (userAnswer === allQuestions[currentQuestion].correctAnswer) {
+			score++;
 		}
 
-		renderQuestion(allQuestions, currentQuestion);
+		if ( ++currentQuestion > (allQuestions.length - 1) ) {
+			//finished with the quiz
+			//tally the score
+
+			$('.next').hide();
+			$('.score').text( 'You\'re finished! Your score is ' + score);
+			$('.restart').show()
+
+		} else {
+
+			$('.question').fadeOut("fast", function(){
+				renderQuestion(allQuestions, currentQuestion);
+			});
+			$('.question').fadeIn("fast");
+			
+		}
+
+	});
+
+	$('.restart').on('click', function() {
+		score = 0;
+		currentQuestion = 0;
+		$('.score').empty();
+		$('.start').trigger('click');
+		$('.restart').hide();
 	});
 
 	$('.back').on('click', function(event){
 		if (--currentQuestion < 0) {
 			currentQuestion = allQuestions.length - 1;
+		} else {
+			renderQuestion(allQuestions, currentQuestion);
 		}
-
-		renderQuestion(allQuestions, currentQuestion);
 	});
 
 })
